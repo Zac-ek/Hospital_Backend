@@ -89,8 +89,6 @@ class CitaMedicaBase(BaseModel):
         if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
         # convertir a aware (UTC) si viene como naive
             value = value.replace(tzinfo=timezone.utc)
-        if value < datetime.now(timezone.utc):
-            raise ValueError("El campo 'Fecha_Programada' no puede ser una fecha pasada.")
         return value
     
     @field_validator("observaciones")
