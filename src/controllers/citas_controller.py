@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.schemas.citas_schemas import CitaMedicaCreate, CitaMedicaUpdate
 from src.db.db_mysql import databaseMysql
 from src.dao.citas_dao import citasDAO
+from uuid import UUID
 
 class CitasController:
     """Controlador para manejar operaciones sobre las citas médicas (Singleton)."""
@@ -29,6 +30,14 @@ class CitasController:
     def read_citas(self, skip: int = 0, limit: int = 10, db: Session = Depends(databaseMysql.get_db)):
         """Obtiene una lista paginada de citas médicas."""
         return citasDAO.get_all_citas(db=db, skip=skip, limit=limit)
+    
+    def get_citas_by_month(self, year: int, month: int, medico_id: UUID, db: Session = Depends(databaseMysql.get_db)):
+        """
+        Valida el parámetro 'month' y retorna las citas cuya fecha_programada esté dentro del mes y año indicados.
+        """
+        if month < 1 or month > 12:
+            raise HTTPException(status_code=400, detail="Mes inválido. Debe estar entre 1 y 12.")
+        return citasDAO.get_citas_by_month(db, year, month, medico_id)
 
     def update_cita(self, cita_id: str, cita_update: CitaMedicaUpdate, db: Session = Depends(databaseMysql.get_db)):
         """Actualiza una cita médica existente."""

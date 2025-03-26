@@ -20,6 +20,7 @@ class CitasRoutes:
         self.router.post("/register", response_model=CitaMedicaResponse)(citas_controller.create_cita)
         self.router.get("/getAll", response_model=list[CitaMedicaResponse])(citas_controller.read_citas)
         self.router.get("/get/{cita_id}", response_model=CitaMedicaResponse)(citas_controller.read_cita)
+        self.router.get("/by_month/{medico_id}", response_model=list[CitaMedicaResponse])(citas_controller.get_citas_by_month)
         self.router.put("/update/{cita_id}", response_model=CitaMedicaResponse)(citas_controller.update_cita)
         self.router.delete("/delete/{cita_id}")(citas_controller.delete_cita)
 
