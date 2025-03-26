@@ -10,7 +10,7 @@ class TipoCitaEnum(str, enum.Enum):
     Rehabilitación = "Rehabilitación"
     Preoperatoria = "Preoperatoria"
     Postoperatoria = "Postoperatoria"
-    Proceminientos = "Proceminientos"
+    Procedimientos = "Procedimientos"
     Seguimiento = "Seguimiento"
 
 class EstatusCitaEnum(str, enum.Enum):
