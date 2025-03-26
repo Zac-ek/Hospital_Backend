@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from src.models.citas_model import CitaMedica
+from src.models.citas_medicas_model import CitaMedica
 from src.schemas.citas_schemas import CitaMedicaCreate, CitaMedicaUpdate
 
 class CitasMedicasDAO:

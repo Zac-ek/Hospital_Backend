@@ -38,6 +38,8 @@ class PersonalMedico(databaseMysql.get_base()):
     
     departamento = relationship("Departamento", back_populates="personal_medico")
     persona = relationship('Persona', back_populates='personal_medico')
+    citas = relationship("CitaMedica", back_populates="personal_medico")
+
 
     def __repr__(self):
         return f"<PersonalMedico(id={self.id}, cedula_profesional={self.cedula_profesional}, tipo={self.tipo}, estatus={self.estatus})>"

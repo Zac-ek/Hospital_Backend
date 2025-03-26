@@ -30,7 +30,7 @@ class UsuariosController:
     from datetime import date
 
     def read_credentials(self, usuario: UsuarioLogin, db: Session = Depends(databaseMysql.get_db)):
-        """Valida credenciales y genera un token de autenticación con información extendida."""
+        """Valida credenciales y genera un token de autenticación con información del rol del usuario."""
         db_credentials = db.query(Usuario).filter(
             Usuario.nombre_usuario == usuario.nombre_usuario,
             Usuario.contrasena == usuario.contrasena
@@ -39,66 +39,27 @@ class UsuariosController:
         if db_credentials is None:
             return JSONResponse(content={'mensaje': 'Acceso denegado'}, status_code=404)
 
-        # Obtener la información de la persona y el personal médico asociado
-        persona = db_credentials.persona
-        personal_medico = db.query(PersonalMedico).filter(
-            PersonalMedico.persona_id == persona.id
-        ).first() if persona else None
+        # Obtener el rol del usuario
+        usuario_rol = db.query(UsuariosRoles).filter(
+            UsuariosRoles.Usuario_ID == db_credentials.id
+        ).first()
+        
+        if usuario_rol:
+            rol = usuario_rol.rol.Nombre  # Accede al nombre del rol
+        else:
+            rol = "Sin Rol"
 
-        tipo_personal = personal_medico.tipo if personal_medico else "No especificado"
-
-        # Construir el payload del token con nombre de usuario y tipo de personal
+        # Construir el payload del token
         token_data = {
             "nombre_usuario": usuario.nombre_usuario,
             "contrasena": usuario.contrasena,
-            "tipo_personal": tipo_personal
+            "rol": rol  # Agregar el rol del usuario al token
         }
 
         # Generar el token JWT
         token: str = jwt_config.solicita_token(token_data)
 
-        def serialize_value(value):
-            """Convierte fechas y valores no serializables en tipos serializables."""
-            if isinstance(value, date):
-                return value.isoformat()  # Convierte la fecha a formato de cadena
-            elif isinstance(value, Decimal):
-                return float(value)  # Convierte Decimal a float
-            return value  # Devuelve el valor tal cual si es serializable
-
-        # Construir la respuesta con toda la información
-        response_data = {
-            "token": token,
-            "usuario": {
-                "id": db_credentials.id,
-                "nombre_usuario": db_credentials.nombre_usuario,
-                "correo_electronico": db_credentials.correo_electronico,
-                "contrasena": db_credentials.contrasena,
-                "numero_telefonico_movil": db_credentials.numero_telefonico_movil,
-                "estatus": db_credentials.estatus
-            },
-            "persona": {
-                "id": persona.id,
-                "nombre": persona.nombre,
-                "primer_apellido": persona.primer_apellido,
-                "segundo_apellido": persona.segundo_apellido,
-                "curp": persona.curp,
-                "genero": persona.genero,
-                "grupo_sanguineo": persona.grupo_sanguineo,
-                "fecha_nacimiento": serialize_value(persona.fecha_nacimiento)
-            } if persona else None,
-            "personal_medico": {
-                "id": personal_medico.id,
-                "cedula_profesional": personal_medico.cedula_profesional,
-                "tipo": personal_medico.tipo,
-                "especialidad": personal_medico.especialidad,
-                "fecha_contratacion": serialize_value(personal_medico.fecha_contratacion),
-                "fecha_termino_contrato": serialize_value(personal_medico.fecha_termino_contrato),
-                "salario": serialize_value(personal_medico.salario),
-                "estatus": personal_medico.estatus
-            } if personal_medico else None
-        }
-
-        return JSONResponse(status_code=200, content=response_data)
+        return JSONResponse(status_code=200, content={"token": token, "rol": rol})
 
     
     def read_users(self, skip: int = 0, limit: int = 10, db: Session = Depends(databaseMysql.get_db)):
