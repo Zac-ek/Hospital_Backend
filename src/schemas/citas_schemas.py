@@ -64,7 +64,7 @@ class CitaMedicaBase(BaseModel):
     @field_validator("tipo")
     @classmethod
     def validar_tipo(cls, value):
-        if value not in ['Revisión', 'Diagnóstico', 'Tratamiento', 'Rehabilitación', 'Preoperatoria', 'Postoperatoria', 'Proceminientos', 'Seguimiento']:
+        if value not in ['Revisión', 'Diagnóstico', 'Tratamiento', 'Rehabilitación', 'Preoperatoria', 'Postoperatoria', 'Procedimientos', 'Seguimiento']:
             raise ValueError(" El valor solo puede ser 'Revisión', 'Diagnóstico', 'Tratamiento', 'Rehabilitación', 'Preoperatoria', 'Postoperatoria', 'Proceminientos', 'Seguimiento'")
         return value
     
