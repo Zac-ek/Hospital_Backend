@@ -30,36 +30,31 @@ class UsuariosController:
     from datetime import date
 
     def read_credentials(self, usuario: UsuarioLogin, db: Session = Depends(databaseMysql.get_db)):
-        """Valida credenciales y genera un token de autenticación con información del rol del usuario."""
-        db_credentials = db.query(Usuario).filter(
+        db_user = db.query(Usuario).filter(
             Usuario.nombre_usuario == usuario.nombre_usuario,
             Usuario.contrasena == usuario.contrasena
         ).first()
 
-        if db_credentials is None:
+        if db_user is None:
             return JSONResponse(content={'mensaje': 'Acceso denegado'}, status_code=404)
 
-        # Obtener el rol del usuario
-        usuario_rol = db.query(UsuariosRoles).filter(
-            UsuariosRoles.Usuario_ID == db_credentials.id
-        ).first()
-        
-        if usuario_rol:
-            rol = usuario_rol.rol.Nombre  # Accede al nombre del rol
-        else:
-            rol = "Sin Rol"
+        # Obtener todos los roles del usuario
+        roles = [rel.rol.Nombre for rel in db_user.usuario_roles]
 
-        # Construir el payload del token
+        if not roles:
+            roles = ["Sin Rol"]
+
         token_data = {
-            "nombre_usuario": usuario.nombre_usuario,
-            "contrasena": usuario.contrasena,
-            "rol": rol  # Agregar el rol del usuario al token
+            "id": db_user.id,
+            "nombre_usuario": db_user.nombre_usuario,
+            "contrasena": db_user.contrasena,
+            "roles": roles
         }
 
-        # Generar el token JWT
         token: str = jwt_config.solicita_token(token_data)
 
-        return JSONResponse(status_code=200, content={"token": token, "rol": rol})
+        return JSONResponse(status_code=200, content={"token": token, "roles": roles})
+
 
     
     def read_users(self, skip: int = 0, limit: int = 10, db: Session = Depends(databaseMysql.get_db)):

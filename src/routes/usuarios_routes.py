@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.controllers.usuarios_controller import usuarios_controller
 from src.schemas.usuarios_schemas import Usuario
-from src.middleware.auth_middleware import auth_middleware
-from src.middleware.role_middleware import role_required
+from src.middleware.role_middleware import RoleRequired
 
 class UsuarioRoutes:
     """Clase que maneja las rutas de usuario con un patrón Singleton."""
@@ -20,7 +19,7 @@ class UsuarioRoutes:
         """Registra los endpoints en el router usando el controlador."""
         self.router.post("/register", response_model=Usuario)(usuarios_controller.create_user)
         self.router.post("/login")(usuarios_controller.read_credentials)
-        self.router.get("/getAll", response_model=list[Usuario], dependencies=[Depends(role_required(["Admin"]))])(usuarios_controller.read_users)
+        self.router.get("/getAll", response_model=list[Usuario], dependencies=[Depends(RoleRequired(["Administrador"]))])(usuarios_controller.read_users)
 
-# Se obtiene la única instancia de la clase y se usa en FastAPI
+# Se obtiene la única instancia de la clase y se usa en FastAPI 
 usuario_routes = UsuarioRoutes().router
