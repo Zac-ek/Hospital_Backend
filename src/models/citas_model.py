@@ -18,7 +18,7 @@ class EstatusCitaEnum(str, enum.Enum):
     Atendida = "Atendida"
     Cancelada = "Cancelada"
     Reprogramada = "Reprogramada"
-    NoAtendida = "No atendida"
+    No_Atendida = "No_Atendida"
     EnProceso = "En proceso"
 
 class CitaMedica(databaseMysql.get_base()):
