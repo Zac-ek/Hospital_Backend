@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect,  HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
 from src.db.db_mysql import databaseMysql
 import asyncio
 from src.routes.usuarios_routes import usuario_routes

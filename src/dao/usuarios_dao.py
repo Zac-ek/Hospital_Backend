@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from src.models.index_models import *
 from src.schemas.usuarios_schemas import UsuarioCreate, UsuarioUpdate
+from sqlalchemy.orm import selectinload
+
 
 class UsuariosDAO:
     _instance = None
@@ -45,10 +47,8 @@ class UsuariosDAO:
         """
         return (
             db.query(Usuario)
-            .filter(
-                Usuario.nombre_usuario == username,
-                Usuario.contrasena == password
-            )
+            .filter(Usuario.nombre_usuario == username, Usuario.contrasena == password)
+            .options(selectinload(Usuario.usuario_roles).selectinload(UsuariosRoles.rol))  # para pre-cargar roles
             .first()
         )
         

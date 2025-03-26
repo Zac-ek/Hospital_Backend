@@ -22,6 +22,7 @@ class JWTConfig:
         """Inicializa la configuración del JWT obteniendo valores desde el .env"""
         self.secret_key = os.getenv("JWT_SECRET_KEY")
         self.algorithm = os.getenv("JWT_ALGORITHM")
+        self.token_expire = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
     def solicita_token(self, dato: Dict) -> str:
         """Genera un token JWT con los datos proporcionados."""

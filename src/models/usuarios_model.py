@@ -24,6 +24,9 @@ class Usuario(databaseMysql.get_base()):
     fecha_actualizacion = Column(DateTime, server_onupdate=text("CURRENT_TIMESTAMP"))
     
     persona = relationship('Persona', back_populates='usuario')
+    usuario_roles = relationship('UsuariosRoles', back_populates='usuario', cascade='all, delete-orphan')
+
+
 
     def __repr__(self):
         return f"<Usuario(id={self.id}, nombre_usuario={self.nombre_usuario}, correo_electronico={self.correo_electronico}, estatus={self.estatus})>"
