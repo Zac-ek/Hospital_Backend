@@ -22,22 +22,27 @@ class GruposSanguineosDAO:
         resultados = (
             db.query(
                 Persona.grupo_sanguineo.label("Grupo_Sanguineo"),
+                Persona.genero.label("Genero"),
                 func.count(Persona.id).label("cantidad_personas"),
-                func.round((func.count(Persona.id) * 100.0) / total_personas, 2).label("porcentaje")
+                func.round(
+                    (func.count(Persona.id) * 100.0) / total_personas, 2
+                ).label("porcentaje")
             )
-            .group_by(Persona.grupo_sanguineo)
-            .order_by(func.count(Persona.id).desc())
+            .group_by(Persona.grupo_sanguineo, Persona.genero)
+            .order_by(func.count(Persona.id).desc())  # Ordenar por cantidad desc
             .all()
         )
 
-        # Convertir los resultados a una lista de diccionarios
+    # Convertir los resultados a una lista de diccionarios
         return [
             {
                 "Grupo_Sanguineo": resultado.Grupo_Sanguineo,
+                "Genero": resultado.Genero,
                 "cantidad_personas": resultado.cantidad_personas,
                 "porcentaje": resultado.porcentaje
             }
             for resultado in resultados
         ]
+
 
 grupos_sanguineos_dao = GruposSanguineosDAO()

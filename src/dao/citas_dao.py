@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from src.models.citas_model import CitaMedica
+from datetime import datetime
+from uuid import UUID
 from src.schemas.citas_schemas import CitaMedicaCreate, CitaMedicaUpdate
 
 class CitasMedicasDAO:
@@ -23,6 +25,19 @@ class CitasMedicasDAO:
 
     def get_cita_by_id(self, db: Session, cita_id: str):
         return db.query(CitaMedica).filter(CitaMedica.id == cita_id).first()
+    
+    def get_citas_by_month(self, db: Session, year: int, month: int, medico_id: UUID):
+        start_date = datetime(year, month, 1)
+        if month == 12:
+            end_date = datetime(year + 1, 1, 1)
+        else:
+            end_date = datetime(year, month + 1, 1)
+
+        return db.query(CitaMedica).filter(
+            CitaMedica.fecha_programada >= start_date,
+            CitaMedica.fecha_programada < end_date,
+            CitaMedica.personal_medico_id == str(medico_id)
+        ).all()
 
     def get_all_citas(self, db: Session, skip: int = 0, limit: int = 10):
         return db.query(CitaMedica).offset(skip).limit(limit).all()
