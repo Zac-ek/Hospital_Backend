@@ -79,7 +79,7 @@ class PersonalMedicoDAO:
             WHERE pm.Persona_ID = :nurse_id AND pm.Tipo = 'Enfermero'
             LIMIT 1
         """)
-        result = db.execute(query, {"doctor_id": nurse_id}).mappings().fetchone()
+        result = db.execute(query, {"nurse_id": nurse_id}).mappings().fetchone()
         return result
     
     def get_all_nurses(self, db: Session):
