@@ -48,12 +48,13 @@ class UsuariosController:
             "id": db_user.id,
             "nombre_usuario": db_user.nombre_usuario,
             "contrasena": db_user.contrasena,
-            "roles": roles
+            "roles": roles,
+            "persona_id": db_user.persona_id
         }
 
         token: str = jwt_config.solicita_token(token_data)
 
-        return JSONResponse(status_code=200, content={"token": token, "roles": roles})
+        return JSONResponse(status_code=200, content={"token": token, "roles": roles, "persona_id": db_user.persona_id})
 
 
     
