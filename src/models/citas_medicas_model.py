@@ -18,7 +18,7 @@ class CitaMedica(databaseMysql.get_base()):
     fecha_inicio = Column("Fecha_Inicio", DateTime, nullable=True)
     fecha_termino = Column("Fecha_Termino", DateTime, nullable=True)
     observaciones = Column("Observaciones", Text, nullable=False)
-    estatus = Column("Estatus", Enum('Programada', 'Atendida', 'Cancelada', 'Reprogramada', 'No atendida', 'En proceso'), default='Programada', nullable=False)
+    estatus = Column("Estatus", Enum('Programada', 'Atendida', 'Cancelada', 'Reprogramada', 'No Atendida', 'EnProceso'), default='Programada', nullable=False)
     fecha_registro = Column("Fecha_Registro", DateTime, default=func.now(), nullable=False)
     fecha_actualizacion = Column("Fecha_Actualizacion", DateTime, nullable=True, onupdate=func.now())
 
