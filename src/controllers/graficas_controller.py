@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from src.db.db_mysql import databaseMysql
 from src.models.index_models import *
 from src.models.personas_model import Persona
+from src.models.personal_medico_model import PersonalMedico
 
 
 class GraficasController:
@@ -40,13 +41,15 @@ class GraficasController:
             departamentos = db.query(Departamento).filter(Departamento.area_medica_id == area.id).all()
 
             for departamento in departamentos:
-                responsable = db.query(Persona).filter(Persona.id == departamento.responsable_id).first()
-                responsable_nombre = f"{responsable.nombre} {responsable.primer_apellido} {responsable.segundo_apellido}" if responsable else "Sin Responsable"
+                responsable = db.query(PersonalMedico).filter(PersonalMedico.id == departamento.responsable_id).first()
+                personal_responsable = db.query(Persona).filter(Persona.id == PersonalMedico.persona_id).first()
+                responsable_nombre = f"{personal_responsable.nombre} {personal_responsable.primer_apellido} {personal_responsable.segundo_apellido}" if responsable else "Sin Responsable"
 
                 departamento_data = {
                     "id": departamento.id,
                     "name": departamento.nombre,
                     "responsable": responsable_nombre,
+                    "abreviatura": departamento.abreviatura,
                     "children": []
                 }
 

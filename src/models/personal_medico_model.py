@@ -34,12 +34,13 @@ class PersonalMedico(databaseMysql.get_base()):
     salario = Column(DECIMAL(10, 2), nullable=False)
     estatus = Column(Enum(EstatusPersonalEnum), server_default=EstatusPersonalEnum.Activo, nullable=False)
     fecha_registro = Column("Fecha_Registro", DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    fecha_actualizacion = Column("Fecha_Actualizacion", DateTime, nullable=True,server_onupdate=text("CURRENT_TIMESTAMP"))
+    fecha_actualizacion = Column("Fecha_Actualizacion", DateTime, nullable=True, server_onupdate=text("CURRENT_TIMESTAMP"))
     
-    departamento = relationship("Departamento", back_populates="personal_medico")
+    # Relaciones
     persona = relationship('Persona', back_populates='personal_medico')
     citas = relationship("CitaMedica", back_populates="personal_medico")
-
+    departamento = relationship("Departamento", foreign_keys=[departamento_id])  # vínculo normal (el que trabaja ahí)
+    departamentos = relationship("Departamento", back_populates="responsable", foreign_keys="Departamento.responsable_id")  # vínculo como responsable
 
     def __repr__(self):
         return f"<PersonalMedico(id={self.id}, cedula_profesional={self.cedula_profesional}, tipo={self.tipo}, estatus={self.estatus})>"
