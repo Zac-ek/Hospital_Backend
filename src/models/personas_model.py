@@ -36,7 +36,7 @@ class Persona(databaseMysql.get_base()):
     fecha_registro = Column("Fecha_Registro", DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")) 
     fecha_actualizacion = Column("Fecha_Actualizacion", DateTime, nullable=True,server_onupdate=text("CURRENT_TIMESTAMP"))
     
-    departamentos = relationship('Departamento', back_populates='responsable')
+    # departamentos = relationship('Departamento', back_populates='responsable')
     personal_medico = relationship('PersonalMedico', back_populates='persona')
     usuario = relationship('Usuario', back_populates='persona')
     citas = relationship("CitaMedica", back_populates="paciente")

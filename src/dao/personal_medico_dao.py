@@ -29,7 +29,7 @@ class PersonalMedicoDAO:
             FROM tbb_personal_medico pm
             LEFT JOIN tbb_personas p ON pm.Persona_ID = p.ID
             LEFT JOIN tbc_departamentos d ON pm.Departamento_ID = d.ID
-            WHERE pm.Persona_ID = :doctor_id AND pm.Tipo = 'Medico'
+            WHERE pm.ID = :doctor_id AND pm.Tipo = 'Medico'
             LIMIT 1
         """)
         result = db.execute(query, {"doctor_id": doctor_id}).mappings().fetchone()
@@ -76,7 +76,7 @@ class PersonalMedicoDAO:
             FROM tbb_personal_medico pm
             LEFT JOIN tbb_personas p ON pm.Persona_ID = p.ID
             LEFT JOIN tbc_departamentos d ON pm.Departamento_ID = d.ID
-            WHERE pm.Persona_ID = :nurse_id AND pm.Tipo = 'Enfermero'
+            WHERE pm.ID = :nurse_id AND pm.Tipo = 'Enfermero'
             LIMIT 1
         """)
         result = db.execute(query, {"nurse_id": nurse_id}).mappings().fetchone()
