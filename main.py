@@ -2,9 +2,11 @@ from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect,  HTTPExcep
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
+from src.tasks.citas_task import revisar_citas_medicas
 from src.websockets.ws_manager import ws_manager
 from src.db.db_mysql import databaseMysql
 import asyncio
+from src.tasks.task_manager import iniciar_tareas_background
 from src.routes.usuarios_routes import usuario_routes
 from src.routes.notas_medicas_routes import notasMedicasRoutes
 from contextlib import asynccontextmanager
@@ -93,11 +95,6 @@ class HospitalBackend:
             client_id, roles = await ws_manager.connect(websocket, token)
             if client_id:
                 await ws_manager.listen(websocket, client_id, roles)
-                
-    async def verificar_bitacora_periodicamente(self):
-        while True:
-            revisar_bitacora()
-            await asyncio.sleep(4)
 
                     
     @asynccontextmanager
@@ -105,7 +102,7 @@ class HospitalBackend:
         """Maneja el ciclo de vida de la aplicación."""
         print("Aplicación iniciada")
         loop = asyncio.get_event_loop()
-        loop.create_task(self.verificar_bitacora_periodicamente())   # Inicia tareas en segundo plano
+        iniciar_tareas_background(loop)
         yield  # Permite que FastAPI continúe su proceso
         print("Aplicación cerrada") 
 
