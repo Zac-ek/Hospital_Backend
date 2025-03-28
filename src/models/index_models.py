@@ -13,6 +13,7 @@ from src.models.departamentos_model import Departamento
 from src.models.espacios_model import Espacio
 from src.models.personal_medico_model import PersonalMedico
 from src.models.citas_medicas_model import CitaMedica
+from src.models.bitacora_model import Bitacora
 
 
 
@@ -27,5 +28,6 @@ __all__ = [
     "PersonalMedico",
     "CitaMedica",
     "ServicioMedico",
-    "Espacio"
+    "Espacio",
+    "Bitacora"
 ]
