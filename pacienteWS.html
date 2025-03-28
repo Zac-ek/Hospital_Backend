@@ -29,6 +29,7 @@
       ws.onopen = () => console.log("Conectado al WebSocket");
 
       ws.onmessage = (event) => {
+        console.log("Mensaje del servidor: " + event.data);
         const data = JSON.parse(event.data);
         if (data.client_id) {
           clientId = data.client_id;
@@ -39,6 +40,15 @@
           li.textContent = `Mensaje del Doctor: ${data.message}`;
           chatBox.appendChild(li);
         }
+      };
+
+      socket.onclose = function(event) {
+        console.log("Conexión cerrada");
+      };
+  
+      // Cuando ocurre un error en la conexión
+      socket.onerror = function(error) {
+        console.error("Error en WebSocket: ", error);
       };
     }
 

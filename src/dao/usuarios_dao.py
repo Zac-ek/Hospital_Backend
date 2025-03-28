@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from src.models.index_models import *
 from src.schemas.usuarios_schemas import UsuarioCreate, UsuarioUpdate
 from sqlalchemy.orm import selectinload
+from uuid import uuid4
+
 
 
 class UsuariosDAO:
@@ -29,6 +31,7 @@ class UsuariosDAO:
         Crea un nuevo usuario en la base de datos.
         """
         db_user = Usuario(
+            id=str(uuid4()),
             persona_id=user.persona_id,
             nombre_usuario=user.nombre_usuario,
             correo_electronico=user.correo_electronico,
