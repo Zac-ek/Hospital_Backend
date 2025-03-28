@@ -58,4 +58,29 @@ class UsuariosDAO:
         """
         return db.query(Usuario).offset(skip).limit(limit).all()
     
+    def obtener_persona_usuario_por_id(self, db: Session, usuario_id: str):
+        resultado = (
+            db.query(
+                Persona.titulo,
+                (Persona.nombre + " " + Persona.primer_apellido + " " + Persona.segundo_apellido).label("nombre_completo"),
+                Persona.grupo_sanguineo,
+                Usuario.correo_electronico,
+                Usuario.numero_telefonico_movil
+            )
+            .join(Usuario, Usuario.persona_id == Persona.id)
+            .filter(Usuario.id == usuario_id)
+            .first()
+        )
+
+        if resultado is None:
+            return None
+
+        return {
+            "titulo": resultado.titulo,
+            "nombre_completo": resultado.nombre_completo.strip(),
+            "grupo_sanguineo": resultado.grupo_sanguineo,
+            "correo_electronico": resultado.correo_electronico,
+            "numero_telefonico_movil": resultado.numero_telefonico_movil
+        }
+    
 usuariosDAO = UsuariosDAO()

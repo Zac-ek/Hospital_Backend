@@ -38,10 +38,10 @@ class Espacio(databaseMysql.get_base()):
     __tablename__ = "tbc_espacios"
 
     ID = Column(CHAR(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    Tipo = Column(Enum(TipoEspacioEnum), nullable=False)
+    Tipo = Column(Enum('Piso', 'Consultorio', 'Laboratorio', 'Quirófano', 'Sala de Espera', 'Edificio', 'Estacionamiento', 'Habitación', 'Cama', 'Sala Maternidad', 'Cunero', 'Morgue', 'Oficina', 'Sala de Juntas', 'Auditorio', 'Cafeteria', 'Capilla', 'Farmacia', 'Ventanilla', 'Recepción'), nullable=False)
     Nombre = Column(String(100), unique=True, nullable=False)
     Departamento_ID = Column(CHAR(36), ForeignKey("tbc_departamentos.id"), nullable=False)
-    Estatus = Column(Enum(EstatusEspacioEnum), default=EstatusEspacioEnum.Activo, nullable=False)
+    Estatus = Column(Enum('Activo', 'Inactivo', 'En remodelación', 'Clausurado', 'Reubicado', 'Temporal'), default=EstatusEspacioEnum.Activo, nullable=False)
     Fecha_Registro = Column(DateTime, default=func.now(), nullable=False)
     Fecha_Actualizacion = Column(DateTime, onupdate=func.now())
     Capacidad = Column(Integer, nullable=False, default=0)
