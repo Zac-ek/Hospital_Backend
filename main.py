@@ -19,6 +19,8 @@ import jwt
 import os
 from uuid import uuid4
 from src.helpers.jwt_config import jwt_config
+from src.tasks.bitacora_tasks import revisar_bitacora
+
 
 class HospitalBackend:
     """Clase Singleton para manejar la configuración y creación de la aplicación FastAPI."""
@@ -92,20 +94,10 @@ class HospitalBackend:
             if client_id:
                 await ws_manager.listen(websocket, client_id, roles)
                 
-    async def monitor_eventos_personas(self):
-        """Monitorea la tabla eventos_personas y envía datos actualizados por WebSocket."""
+    async def verificar_bitacora_periodicamente(self):
         while True:
-            await asyncio.sleep(5)  # Intervalo de consulta de 0.5 segundos
-
-            db: Session = next(databaseMysql.get_db())
-            try:
-                grupo_sanguineos = grupos_sanguineos_dao.obtener_todos(db)
-            finally:
-                db.close() 
-            await ws_manager.broadcast({
-                "message": "Actualización de grupos sanguíneos",
-                "grupo_sanguineo": grupo_sanguineos
-            }, ["Paciente","Administrador"])
+            revisar_bitacora()
+            await asyncio.sleep(4)
 
                     
     @asynccontextmanager
@@ -113,7 +105,7 @@ class HospitalBackend:
         """Maneja el ciclo de vida de la aplicación."""
         print("Aplicación iniciada")
         loop = asyncio.get_event_loop()
-        loop.create_task(self.monitor_eventos_personas())   # Inicia tareas en segundo plano
+        loop.create_task(self.verificar_bitacora_periodicamente())   # Inicia tareas en segundo plano
         yield  # Permite que FastAPI continúe su proceso
         print("Aplicación cerrada") 
 
@@ -148,3 +140,12 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         headers={"Access-Control-Allow-Origin": "*"}
     )
 app.lifespan = app_instance.lifespan
+
+@app.get("/users/online-doctors")
+async def get_online_doctors():
+    return [
+        {"user_id": user_id, "client_id": client_id}
+        for user_id, client_id in ws_manager.user_client_map.items()
+        if "Médico General" in ws_manager.channels and client_id in ws_manager.channels["Médico General"]
+    ]
+

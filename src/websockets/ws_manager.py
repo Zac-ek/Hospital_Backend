@@ -6,6 +6,7 @@ from src.helpers.jwt_config import jwt_config
 from src.db.db_mysql import databaseMysql
 from src.dao.grupos_sanguineos_dao import grupos_sanguineos_dao
 import jwt
+import asyncio
 
 class WebSocketManager:
     """
@@ -14,6 +15,8 @@ class WebSocketManager:
     def __init__(self):
         self.clients: Dict[str, WebSocket] = {}
         self.channels: Dict[str, set] = {}
+        self.chat_rooms: Dict[str, list[str]] = {}
+        self.user_client_map: Dict[str, str] = {}
 
     async def connect(self, websocket: WebSocket, token: str):
         try:
@@ -24,6 +27,9 @@ class WebSocketManager:
 
         client_id = str(uuid4())
         self.clients[client_id] = websocket
+        
+        user_id = payload.get("id")
+        self.user_client_map[user_id] = client_id 
 
         roles = payload.get("roles", [])
         for role in roles:
@@ -43,10 +49,23 @@ class WebSocketManager:
     async def listen(self, websocket: WebSocket, client_id: str, roles: list):
         try:
             while True:
-                message = await websocket.receive_text()
-                await websocket.send_text(f"Mensaje recibido: {message}")
+                data = await websocket.receive_json()
+                to_client = data.get("to")
+                message = data.get("message")
+                print(data)
+                print(to_client)
+                print(message)
+
+                # Asocia al paciente al doctor si no está
+                for role in roles:
+                    if "Paciente" in role and to_client:
+                        self.add_to_chat_room(to_client, client_id)
+
+                # Envía el mensaje privado
+                await self.send_private_message(client_id, to_client, message)
         except WebSocketDisconnect:
             self.disconnect(client_id, roles)
+
 
     def disconnect(self, client_id: str, roles: list):
         for role in roles:
@@ -85,6 +104,29 @@ class WebSocketManager:
         client = self.clients.get(client_id)
         if client:
             await client.send_json(data)
+            
+    def broadcast_sync(self, data: dict, channels: list[str]):
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.create_task(self.broadcast(data, channels))
+        else:
+            loop.run_until_complete(self.broadcast(data, channels))
+            
+    async def send_private_message(self, sender_id: str, receiver_id: str, message: str):
+        """Enviar mensaje privado entre cliente y cliente."""
+        receiver_ws = self.clients.get(receiver_id)
+        if receiver_ws:
+            await receiver_ws.send_json({
+                "from": sender_id,
+                "message": message
+            })
+            
+    def add_to_chat_room(self, doctor_id: str, patient_id: str):
+        """Asocia un paciente a un doctor cuando inicia el chat."""
+        if doctor_id not in self.chat_rooms:
+            self.chat_rooms[doctor_id] = []
+        if patient_id not in self.chat_rooms[doctor_id]:
+            self.chat_rooms[doctor_id].append(patient_id)
 
 
 # Instancia global para usar en otros módulos
