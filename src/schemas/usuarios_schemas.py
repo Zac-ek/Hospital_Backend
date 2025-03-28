@@ -75,13 +75,19 @@ class UsuarioUpdate(BaseModel):
     estatus: Optional[str] = None
 
 
-class Usuario(UsuarioBase):
+class Usuario(BaseModel):
     id: str
+    persona_id: Optional[str] = None
+    nombre_usuario: str
+    correo_electronico: str
+    contrasena: str
+    numero_telefonico_movil: str
+    estatus: Optional[str]
     fecha_registro: datetime
     fecha_actualizacion: Optional[datetime] = None
 
     model_config = {
-        "from_attributes": True  # Equivalente a `orm_mode = True` en Pydantic v1
+        "from_attributes": True
     }
 
 

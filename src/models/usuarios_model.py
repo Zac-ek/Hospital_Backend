@@ -14,10 +14,10 @@ class Usuario(databaseMysql.get_base()):
     __tablename__ = "tbb_usuarios"
 
     id = Column(CHAR(36), primary_key=True, server_default=func.uuid())
-    persona_id = Column(CHAR(36), ForeignKey("tbb_personas.id"), nullable=False)
+    persona_id = Column(CHAR(36), ForeignKey("tbb_personas.id"), unique=True, nullable=False)
     nombre_usuario = Column(String(40), unique=True, nullable=False)
     correo_electronico = Column(String(100), unique=True, nullable=False)
-    contrasena = Column(String(40), nullable=False)
+    contrasena = Column(String(60), nullable=False)
     numero_telefonico_movil = Column(CHAR(19), unique=True, nullable=False)
     estatus = Column(Enum(EstatusEnum), nullable=True, server_default=EstatusEnum.Activo)
     fecha_registro = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
