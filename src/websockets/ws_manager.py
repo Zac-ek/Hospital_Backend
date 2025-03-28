@@ -127,6 +127,13 @@ class WebSocketManager:
             self.chat_rooms[doctor_id] = []
         if patient_id not in self.chat_rooms[doctor_id]:
             self.chat_rooms[doctor_id].append(patient_id)
+            
+    def send_message_to_client_sync(self, client_id: str, data: dict):
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.create_task(self.send_message_to_client(client_id, data))
+        else:
+            loop.run_until_complete(self.send_message_to_client(client_id, data))
 
 
 # Instancia global para usar en otros módulos
