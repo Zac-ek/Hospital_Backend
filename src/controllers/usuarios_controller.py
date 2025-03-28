@@ -27,8 +27,6 @@ class UsuariosController:
             raise HTTPException(status_code=400, detail="Usuario existente, intenta nuevamente")
         return usuariosDAO.create_user(db=db, user=user)
 
-    from datetime import date
-
     def read_credentials(self, usuario: UsuarioLogin, db: Session = Depends(databaseMysql.get_db)):
         db_user = db.query(Usuario).filter(
             Usuario.nombre_usuario == usuario.nombre_usuario,
@@ -55,8 +53,16 @@ class UsuariosController:
         token: str = jwt_config.solicita_token(token_data)
 
         return JSONResponse(status_code=200,content={"token": token,"roles": roles,"persona_id": db_user.persona_id})
-
-
+    
+    def obtener_persona_usuario_por_id(self, usuario_id: str, db: Session = Depends(databaseMysql.get_db)):
+        """Obtiene los datos de persona y usuario por ID de usuario."""
+        try:
+            resultado = usuariosDAO.obtener_persona_usuario_por_id(db, usuario_id)
+            if not resultado:
+                return JSONResponse(status_code=404, content={"mensaje": "Usuario no encontrado"})
+            return JSONResponse(status_code=200, content={"datos": resultado})
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al obtener datos: {str(e)}")
     
     def read_users(self, skip: int = 0, limit: int = 10, db: Session = Depends(databaseMysql.get_db)):
         db_users = usuariosDAO.get_users(db=db, skip=skip, limit=limit)

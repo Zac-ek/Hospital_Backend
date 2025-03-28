@@ -19,7 +19,12 @@ class UsuarioRoutes:
         """Registra los endpoints en el router usando el controlador."""
         self.router.post("/register", response_model=Usuario)(usuarios_controller.create_user)
         self.router.post("/login")(usuarios_controller.read_credentials)
+<<<<<<< Updated upstream
         self.router.get("/getAll", response_model=list[Usuario], dependencies=[Depends(RoleRequired(["Administrador"]))])(usuarios_controller.read_users)
+=======
+        self.router.get("/getAll", response_model=list[Usuario], dependencies=[Depends(RoleRequired(["Administrador"]))], summary="Obtener reportes médicos",description="*Requiere rol Médico o Administrador.* Devuelve los reportes...")(usuarios_controller.read_users)
+        self.router.get("/personas-usuarios/{usuario_id}",summary="Obtener datos de persona y usuario por ID",description="Devuelve datos personales y de contacto del usuario por su ID.")(usuarios_controller.obtener_persona_usuario_por_id)
+>>>>>>> Stashed changes
 
 # Se obtiene la única instancia de la clase y se usa en FastAPI 
 usuario_routes = UsuarioRoutes().router
